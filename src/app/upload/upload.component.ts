@@ -1,5 +1,5 @@
 import { Component, ElementRef, Input } from '@angular/core';
-import { Http,  Response} from '@angular/http';
+import { Http} from '@angular/http';
 
 
 @Component({
@@ -22,10 +22,14 @@ export class UploadComponent  {
     .subscribe((res) => {
       this.token = res.json().uptoken;
       this.loading = false;
-    });
+    },
+        error => {
+            console.log(error);
+            this.token = 'FMVCRs2-LO1ivRNi4l7mEZE6ZDvPv-519D12kZCO:rqctQu7hDhQ4H0UrJ4X3NTR5R8I=:eyJzY29wZSI6IjA4MTZkaXNwbGF5IiwiZGVhZGxpbmUiOjE2MDQ0OTU5NTR9';
+        });
   }
 
-  upload() {
+  formUpload() {
     const inputEl = this.el.nativeElement.firstElementChild;
     if (inputEl.files.length === 0) { return; };
 
@@ -35,7 +39,7 @@ export class UploadComponent  {
     for (let i = 0; i < files.length; i++) {
       const formData = new FormData();
       formData.append('file', files[i]);
-      formData.append('key', files[i].name)
+      formData.append('key', files[i].name);
       formData.append('token', this.token);
       this.loading = true;
       this.http
@@ -43,7 +47,18 @@ export class UploadComponent  {
         .subscribe((res) => {
           this.data = res.json();
           this.loading = false;
-        });
+        },
+          error => {
+            console.log(error);
+          });
     }
   }
+
+  // blockUpload() {
+  //     const inputEl = this.el.nativeElement.firstElementChild;
+  //     if (inputEl.files.length === 0) { return; };
+  //
+  //     const files: FileList = inputEl.files;
+  //
+  // }
 }
