@@ -1,0 +1,5 @@
+
+<input type="file" [attr.multiple]="multiple ? true : null" (change) = "getToken()">
+<button type="button" (click)="upload()">确认上传</button>
+<div *ngIf="loading">loading</div>
+<pre>{{data| json}}</pre>
