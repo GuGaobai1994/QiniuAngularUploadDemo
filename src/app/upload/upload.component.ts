@@ -10,7 +10,7 @@ import { Http} from '@angular/http';
 export class UploadComponent  {
   data: Object;
   loading: boolean;
-  token: String;
+  token;
 
   @Input() multiple = false;
   constructor(private http: Http,
@@ -25,7 +25,8 @@ export class UploadComponent  {
     },
         error => {
             console.log(error);
-            this.token = 'FMVCRs2-LO1ivRNi4l7mEZE6ZDvPv-519D12kZCO:rqctQu7hDhQ4H0UrJ4X3NTR5R8I=:eyJzY29wZSI6IjA4MTZkaXNwbGF5IiwiZGVhZGxpbmUiOjE2MDQ0OTU5NTR9';
+            this.token = 'FMVCRs2-LO1ivRNi4l7mEZE6ZD' +
+                'vPv-519D12kZCO:rqctQu7hDhQ4H0UrJ4X3NTR5R8I=:eyJzY29wZSI6IjA4MTZkaXNwbGF5IiwiZGVhZGxpbmUiOjE2MDQ0OTU5NTR9';
         });
   }
 
