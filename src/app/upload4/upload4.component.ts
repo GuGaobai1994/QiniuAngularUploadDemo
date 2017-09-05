@@ -1,5 +1,5 @@
 import {Component, ElementRef, Input, OnInit} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import 'rxjs/add/operator/retry';
 
 interface UptokenResponse {
@@ -11,15 +11,36 @@ interface UpRet {
     key: string;
 }
 
+interface MkBlkRet {
+    ctx: string;
+    checksum: string;
+    crc32: string;
+    offset: string;
+    host: string;
+}
+
+class CtxList {
+    private num: number;
+    private ctx: string;
+    constructor(num, ctx) {
+    }
+}
+
 @Component({
   selector: 'app-upload4',
   templateUrl: './upload4.component.html',
   styleUrls: ['./upload4.component.css']
 })
+
+
 export class Upload4Component implements OnInit {
     uptoken: string;
     loading: boolean;
     data: object;
+    blockSize: number = 4 * 1024 * 1024;
+    ctxList: CtxList[] = [];
+    list: string[] = [];
+
     @Input() multiple = false;
 
     constructor(private http: HttpClient, private el: ElementRef) {
@@ -69,7 +90,29 @@ export class Upload4Component implements OnInit {
         if (inputEl.files.length === 0) {
             return;
         };
-
         const files: FileList = inputEl.files;
+        const fileSize: number = files[0].size;
+        const blockCount = Math.ceil(fileSize / this.blockSize);
+        for ( let i = 0; i < blockCount; i ++) {
+            const start: number = i * this.blockSize;
+            const end: number = start + this.blockSize;
+            this.http.post<MkBlkRet>('http://up.qiniu.com/mkblk/' + files[0].slice(start, end).size , files[0].slice(start, end),
+            {headers: new HttpHeaders().set('Authorization', 'UpToken ' + this.uptoken),
+            }).subscribe(
+                data => {
+                    this.data = data;
+                    this.ctxList.push(new CtxList(i, data.ctx));
+                    this.list[i] = data.ctx;
+                },
+                err => {
+                    this.data = err;
+                }
+            );
+        }
     }
+    makeFile(): void {
+        console.log(this.ctxList.length);
+    }
+
+
 }
