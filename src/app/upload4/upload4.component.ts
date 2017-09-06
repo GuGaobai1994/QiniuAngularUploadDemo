@@ -40,6 +40,7 @@ export class Upload4Component implements OnInit {
     blockSize: number = 4 * 1024 * 1024;
     ctxList: CtxList[] = [];
     list: string[] = [];
+    fileSize: number;
 
     @Input() multiple = false;
 
@@ -91,8 +92,8 @@ export class Upload4Component implements OnInit {
             return;
         };
         const files: FileList = inputEl.files;
-        const fileSize: number = files[0].size;
-        const blockCount = Math.ceil(fileSize / this.blockSize);
+        this.fileSize = files[0].size;
+        const blockCount = Math.ceil(this.fileSize / this.blockSize);
         for ( let i = 0; i < blockCount; i ++) {
             const start: number = i * this.blockSize;
             const end: number = start + this.blockSize;
@@ -101,7 +102,6 @@ export class Upload4Component implements OnInit {
             }).subscribe(
                 data => {
                     this.data = data;
-                    this.ctxList.push(new CtxList(i, data.ctx));
                     this.list[i] = data.ctx;
                 },
                 err => {
@@ -112,6 +112,18 @@ export class Upload4Component implements OnInit {
     }
     makeFile(): void {
         console.log(this.ctxList.length);
+        console.log(this.list);
+        this.http.post<MkBlkRet>('http://up.qiniu.com/mkfile/' + this.fileSize , this.list.toString(),
+            {headers: new HttpHeaders().set('Authorization', 'UpToken ' + this.uptoken),
+            }).subscribe(
+            data => {
+                this.data = data;
+            },
+            err => {
+                this.data = err;
+            }
+        );
+
     }
 
 
