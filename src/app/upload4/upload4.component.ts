@@ -1,5 +1,5 @@
 import {Component, ElementRef, Input, OnInit} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpEventType, HttpHeaders, HttpRequest, HttpResponse} from '@angular/common/http';
 import 'rxjs/add/operator/retry';
 
 interface UptokenResponse {
@@ -38,10 +38,7 @@ export class Upload4Component implements OnInit {
     loading: boolean;
     data: object;
     blockSize: number = 4 * 1024 * 1024;
-    ctxList: CtxList[] = [];
-    list: string[] = [];
-    fileSize: number;
-
+    progress: string;
     @Input() multiple = false;
 
     constructor(private http: HttpClient, private el: ElementRef) {
@@ -73,16 +70,24 @@ export class Upload4Component implements OnInit {
             formData.append('key', files[i].name);
             formData.append('token', this.uptoken);
             this.loading = true;
-            this.http.post( 'http://up.qiniu.com', formData, {})
+            const request = new HttpRequest(
+                'POST', 'http://up.qiniu.com', formData,
+                {reportProgress: true});
+            this.http.request(request)
                 .retry(3)
                 .subscribe(
-                    data => {
-                        this.data = data;
-                    },
-                    err => {
-                      this.data = err;
-                    }
-                );
+                    event => {
+                        // Via this API, you get access to the raw event stream.
+                        // Look for upload progress events.
+                        if (event.type === HttpEventType.UploadProgress) {
+                            // This is an upload progress event. Compute and show the % done:
+                            const percentDone = Math.round(100 * event.loaded / event.total);
+                            console.log(`File is ${percentDone}% uploaded.`);
+                            this.progress = `File is ${percentDone}% uploaded.`;
+                        } else if (event instanceof HttpResponse) {
+                            console.log(`${event.body['key']} is uploaded`)
+                            this.progress = `${event.body['key']} is uploaded`;
+        }});
             this.loading = false;
         }
     }
@@ -91,9 +96,10 @@ export class Upload4Component implements OnInit {
         if (inputEl.files.length === 0) {
             return;
         };
+        const list: string[] = [];
         const files: FileList = inputEl.files;
-        this.fileSize = files[0].size;
-        const blockCount = Math.ceil(this.fileSize / this.blockSize);
+        const fileSize = files[0].size;
+        const blockCount = Math.ceil(fileSize / this.blockSize);
         for ( let i = 0; i < blockCount; i ++) {
             const start: number = i * this.blockSize;
             const end: number = start + this.blockSize;
@@ -102,7 +108,17 @@ export class Upload4Component implements OnInit {
             }).subscribe(
                 data => {
                     this.data = data;
-                    this.list[i] = data.ctx;
+                    list[i] = data.ctx;
+                    let m: Boolean = true;
+                    for (let n = 0; n < list.length; n++) {
+                        if ((list[n] == null)) {
+                            m = false;
+                        }
+                    }
+                    console.log(m);
+                    if (m && (list.length = blockCount)) {
+                        this.makeFile(list.toString(), fileSize);
+                    }
                 },
                 err => {
                     this.data = err;
@@ -110,10 +126,8 @@ export class Upload4Component implements OnInit {
             );
         }
     }
-    makeFile(): void {
-        console.log(this.ctxList.length);
-        console.log(this.list);
-        this.http.post<MkBlkRet>('http://up.qiniu.com/mkfile/' + this.fileSize , this.list.toString(),
+    makeFile(list: string, fileSize: number): void {
+        this.http.post<MkBlkRet>('http://up.qiniu.com/mkfile/' + fileSize , list.toString(),
             {headers: new HttpHeaders().set('Authorization', 'UpToken ' + this.uptoken),
             }).subscribe(
             data => {
