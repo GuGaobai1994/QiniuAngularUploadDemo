@@ -1,6 +1,7 @@
 import {Component, ElementRef, Input, OnInit} from '@angular/core';
 import {HttpClient, HttpEventType, HttpHeaders, HttpRequest, HttpResponse} from '@angular/common/http';
 import 'rxjs/add/operator/retry';
+import {unescape} from 'querystring';
 
 interface UptokenResponse {
     uptoken: string ;
@@ -81,10 +82,10 @@ export class Upload4Component implements OnInit {
         };
         const files: FileList = inputEl.files;
         for (let i = 0 ; i < files.length ; i++) {
-            this.makeBlock(files[i]);
+            this.makeBlock(files[i], files[i].name);
         }
     }
-    makeBlock(file: File): void {
+    makeBlock(file: File, key: string): void {
         const fileSize: number = file.size;
         const list: string[] = [];
         const blockCount = Math.ceil(fileSize / this.blockSize);
@@ -105,7 +106,7 @@ export class Upload4Component implements OnInit {
                     this.progress = `Block ${i} is uploaded`
                     console.log(`列表完整${m}, 分块数量${blockCount}, 列表长度${list.length}, 是否合并${m && (list.length === blockCount)}`);
                     if (m && (list.length === blockCount)) {
-                        this.makeFile(list.toString(), fileSize);
+                        this.makeFile(list.toString(), fileSize, key);
                     }
                 },
                 err => {
@@ -114,8 +115,8 @@ export class Upload4Component implements OnInit {
             );
         }
     }
-    makeFile(list: string, fileSize: number): void {
-        this.http.post(this.upHost + '/mkfile/' + fileSize , list.toString(),
+    makeFile(list: string, fileSize: number, key: string): void {
+        this.http.post(this.upHost + '/mkfile/' + fileSize + '/key/' + btoa(key), list.toString(),
             {headers: new HttpHeaders().set('Authorization', 'UpToken ' + this.uptoken),
             }).subscribe(
             data => {
