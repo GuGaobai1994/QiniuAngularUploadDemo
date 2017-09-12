@@ -6,6 +6,9 @@ import {HttpClientModule} from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { UploadComponent } from './upload/upload.component';
 import { Upload4Component } from './upload4/upload4.component';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {MdRadioModule, MdProgressBarModule} from '@angular/material';
+
 
 @NgModule({
   declarations: [
@@ -17,8 +20,7 @@ import { Upload4Component } from './upload4/upload4.component';
     BrowserModule,
     FormsModule,
     HttpModule,
-    HttpClientModule,
-  ],
+    HttpClientModule, BrowserAnimationsModule, MdRadioModule, MdProgressBarModule],
   providers: [],
   bootstrap: [AppComponent]
 })

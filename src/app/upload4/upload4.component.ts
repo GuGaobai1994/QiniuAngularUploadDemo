@@ -27,6 +27,7 @@ export class Upload4Component implements OnInit {
     loading: boolean;
     blockSize: number = 4 * 1024 * 1024;
     progress: string;
+    percentDone = 0;
     upHost = 'http://upload.qiniu.com';
     @Input() multiple = true;
 
@@ -67,8 +68,9 @@ export class Upload4Component implements OnInit {
                 .subscribe(
                     event => {
                         if (event.type === HttpEventType.UploadProgress) {
-                            const percentDone = Math.round(100 * event.loaded / event.total);
-                            this.progress = `File is ${percentDone}% uploaded.`;
+                            this.loading = true;
+                            this.percentDone = Math.round(100 * event.loaded / event.total);
+                            this.progress = `File is ${this.percentDone}% uploaded.`;
                         } else if (event instanceof HttpResponse) {
                             this.progress = `${event.body['key']} is uploaded`;
         }});
