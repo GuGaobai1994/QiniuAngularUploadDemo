@@ -7,7 +7,7 @@ import { AppComponent } from './app.component';
 import { UploadComponent } from './upload/upload.component';
 import { Upload4Component } from './upload4/upload4.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {MdRadioModule, MdProgressBarModule} from '@angular/material';
+import {MdRadioModule, MdProgressBarModule, MdButtonModule, MdInputModule} from '@angular/material';
 
 
 @NgModule({
@@ -20,7 +20,7 @@ import {MdRadioModule, MdProgressBarModule} from '@angular/material';
     BrowserModule,
     FormsModule,
     HttpModule,
-    HttpClientModule, BrowserAnimationsModule, MdRadioModule, MdProgressBarModule],
+    HttpClientModule, BrowserAnimationsModule, MdRadioModule, MdProgressBarModule, MdButtonModule, MdInputModule],
   providers: [],
   bootstrap: [AppComponent]
 })

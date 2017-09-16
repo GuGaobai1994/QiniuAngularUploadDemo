@@ -40,8 +40,7 @@ export class Upload4Component implements OnInit {
                 this.uptoken = data.uptoken;
             },
             err => {
-                this.uptoken = 'FMVCRs2-LO1ivRNi4l7mEZE6ZDvPv-519D12kZCO:rqctQu7hDhQ4H0U' +
-                    'rJ4X3NTR5R8I=:eyJzY29wZSI6IjA4MTZkaXNwbGF5IiwiZGVhZGxpbmUiOjE2MDQ0OTU5NTR9';
+                this.uptoken = 'FMVCRs2-LO1ivRNi4l7mEZE6ZDvPv-519D12kZCO:B62xxVvDRpqNrW43VG2b5rpZiMI=:eyJzY29wZSI6IjA4MTZkaXNwbGF5IiwicmV0dXJuQm9keSI6IntcImtleVwiOlwiJChrZXkpXCIsXCJoYXNoXCI6XCIkKGV0YWcpXCIsXCJidWNrZXRcIjpcIiQoYnVja2V0KVwiLFwiZnNpemVcIjokKGZzaXplKX0iLCJkZWFkbGluZSI6MTUwNTM0NzM3OX0=';
             });
     }
 
